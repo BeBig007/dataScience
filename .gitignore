@@ -5,3 +5,4 @@ ENV/
 
 # Large CSV files
 postgres_db/customer/*.csv
+item/*.csv
