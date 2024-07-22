@@ -4,6 +4,7 @@ services:
   postgres:
     image: postgres:latest
     container_name: postgres
+    build: postgres_db
     environment:
       POSTGRES_DB: ${PG_NAME}
       POSTGRES_USER: ${PG_USER}
