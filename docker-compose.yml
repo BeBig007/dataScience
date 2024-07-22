@@ -2,7 +2,7 @@ version: '3.8'
 
 services:
   postgres:
-    image: postgres:latest
+    image: postgres:16.3
     container_name: postgres
     build: postgres_db
     environment:
@@ -18,7 +18,7 @@ services:
     init: true
 
   pgadmin:
-    image: dpage/pgadmin4:latest
+    image: dpage/pgadmin4:8.9
     container_name: pgadmin
     environment:
       PGADMIN_DEFAULT_EMAIL: ${PGADMIN_MAIL}
@@ -30,25 +30,6 @@ services:
       - postgres
     env_file: .env
 
-
 volumes:
   postgres_data:
     name: postgres_data
-
-
-# CREATE TABLE data_2022_dec(
-# event_time TIMESTAMP WITHOUT TIME ZONE,
-# event_type VARCHAR(50),
-# product_id INTEGER,
-# price DECIMAL(10, 2),
-# user_id BIGINT,
-# user_session UUID
-# )
-
-# \copy data_2022_dec(event_time, event_type, product_id, price, user_id, user_session)
-# FROM './customer/data_2022_dec.csv'
-#
-# \copy data_2022_dec(event_time, event_type, product_id, price, user_id, user_session)
-# FROM './customer/data_2022_dec.csv'
-# DELIMITER ','
-# CSV HEADER;

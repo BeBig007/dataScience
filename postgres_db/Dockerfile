@@ -1,4 +1,4 @@
-FROM postgres:latest
+FROM postgres:16.3
 
 COPY customer/* /docker-entrypoint-initdb.d/
 COPY setup.sql /docker-entrypoint-initdb.d/

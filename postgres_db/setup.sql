@@ -2,7 +2,7 @@
 
 -- Create tables
 CREATE TABLE data_2022_oct (
-    event_time TIMESTAMP,
+    event_time TIMESTAMP WITH TIME ZONE,
     event_type VARCHAR(100),
     product_id INTEGER,
     price NUMERIC(10, 2),
@@ -11,7 +11,7 @@ CREATE TABLE data_2022_oct (
 );
 
 CREATE TABLE data_2022_nov (
-    event_time TIMESTAMP,
+    event_time TIMESTAMP WITH TIME ZONE,
     event_type VARCHAR(100),
     product_id INTEGER,
     price NUMERIC(10, 2),
@@ -20,7 +20,7 @@ CREATE TABLE data_2022_nov (
 );
 
 CREATE TABLE data_2022_dec (
-    event_time TIMESTAMP,
+    event_time TIMESTAMP WITH TIME ZONE,
     event_type VARCHAR(100),
     product_id INTEGER,
     price NUMERIC(10, 2),
@@ -29,7 +29,7 @@ CREATE TABLE data_2022_dec (
 );
 
 CREATE TABLE data_2023_jan (
-    event_time TIMESTAMP,
+    event_time TIMESTAMP WITH TIME ZONE,
     event_type VARCHAR(100),
     product_id INTEGER,
     price NUMERIC(10, 2),
