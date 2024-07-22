@@ -5,51 +5,44 @@ services:
     image: postgres:latest
     container_name: postgres
     environment:
-      POSTGRES_USER: bebigel
-      POSTGRES_PASSWORD: mysecretpassword
-      POSTGRES_DB: piscineds
+      POSTGRES_DB: ${PG_NAME}
+      POSTGRES_USER: ${PG_USER}
+      POSTGRES_PASSWORD: ${PG_PWD}
     restart: unless-stopped
     ports:
       - "5432:5432"
     volumes:
       - postgres_data:/var/lib/postgresql/data
+    env_file: .env
     init: true
 
   pgadmin:
     image: dpage/pgadmin4:latest
     container_name: pgadmin
     environment:
-      PGADMIN_DEFAULT_EMAIL: bebigel@student.42.fr
-      PGADMIN_DEFAULT_PASSWORD: admin42
+      PGADMIN_DEFAULT_EMAIL: ${PGADMIN_MAIL}
+      PGADMIN_DEFAULT_PASSWORD: ${PGADMIN_PWD}
     restart: unless-stopped
     ports:
       - "8080:80"
     depends_on:
       - postgres
+    env_file: .env
+
 
 volumes:
   postgres_data:
     name: postgres_data
 
-# docker-compose up -d
-# docker exec -it postgres sh
-# psql -U bebigel -d piscineds -h localhost -W
-# localhost:8080 to connect to pgadmin
-#   -> add new server
-#       -> name: local_postgres
-#       -> host: postgres
-#       -> port: 5432
-#       -> username: bebigel
-#       -> password: mysecretpassword
 
-CREATE TABLE data_2022_dec(
-event_time TIMESTAMP WITHOUT TIME ZONE,
-event_type VARCHAR(50),
-product_id INTEGER,
-price DECIMAL(10, 2),
-user_id BIGINT,
-user_session UUID
-)
+# CREATE TABLE data_2022_dec(
+# event_time TIMESTAMP WITHOUT TIME ZONE,
+# event_type VARCHAR(50),
+# product_id INTEGER,
+# price DECIMAL(10, 2),
+# user_id BIGINT,
+# user_session UUID
+# )
 
 # \copy data_2022_dec(event_time, event_type, product_id, price, user_id, user_session)
 # FROM './customer/data_2022_dec.csv'

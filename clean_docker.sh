@@ -1,18 +1,19 @@
 #!/bin/bash
 
-# Arrêter tous les conteneurs
+# stop all containers
 docker stop $(docker ps -q)
 
-# Supprimer tous les conteneurs
+# remove all containers
 docker rm $(docker ps -a -q)
 
-# Supprimer tous les volumes
+# remove volumes
 docker volume rm $(docker volume ls -q)
 
-# Supprimer toutes les images
+# remove images
 docker rmi $(docker images -q)
 
-# Supprimer tous les réseaux personnalisés
+# remove networks
 docker network rm $(docker network ls -q)
 
+echo ""
 echo "~> Full clean docker done!"
