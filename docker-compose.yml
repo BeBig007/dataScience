@@ -4,7 +4,9 @@ services:
   postgres:
     image: postgres:16.3
     container_name: postgres
-    build: postgres_db
+    build:
+      context: .
+      dockerfile: postgres_db/Dockerfile
     environment:
       POSTGRES_DB: ${PG_NAME}
       POSTGRES_USER: ${PG_USER}

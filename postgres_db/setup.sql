@@ -37,8 +37,16 @@ CREATE TABLE data_2023_jan (
     user_session UUID
 );
 
+CREATE TABLE item (
+    product_id INTEGER,
+    category_id BIGINT,
+    category_code VARCHAR(100),
+    brand VARCHAR(50)
+);
+
 -- Import data into tables
 COPY data_2022_oct FROM '/docker-entrypoint-initdb.d/data_2022_oct.csv' DELIMITER ',' CSV HEADER;
 COPY data_2022_nov FROM '/docker-entrypoint-initdb.d/data_2022_nov.csv' DELIMITER ',' CSV HEADER;
 COPY data_2022_dec FROM '/docker-entrypoint-initdb.d/data_2022_dec.csv' DELIMITER ',' CSV HEADER;
 COPY data_2023_jan FROM '/docker-entrypoint-initdb.d/data_2023_jan.csv' DELIMITER ',' CSV HEADER;
+COPY item FROM '/docker-entrypoint-initdb.d/item.csv' DELIMITER ',' CSV HEADER;

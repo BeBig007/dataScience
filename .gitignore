@@ -4,5 +4,5 @@ env/
 ENV/
 
 # Large CSV files
-postgres_db/customer/*.csv
+customer/*.csv
 item/*.csv
