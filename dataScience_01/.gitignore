@@ -1,0 +1,7 @@
+# Environments
+.env
+env/
+ENV/
+
+# Large CSV files
+data/*.csv
