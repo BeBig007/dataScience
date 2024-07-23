@@ -15,5 +15,8 @@ docker rmi $(docker images -q)
 # remove networks
 docker network rm $(docker network ls -q)
 
+# remove all images
+docker system prune -a
+
 echo ""
 echo "~> Full clean docker done!"
