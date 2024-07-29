@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/bin/sh
 
 # stop all containers
 docker stop $(docker ps -q)
@@ -18,5 +18,4 @@ docker network rm $(docker network ls -q)
 # remove all images
 docker system prune -a
 
-echo ""
-echo "~> Full clean docker done!"
+echo "\n\033[1;32m⇾ Full clean docker done!\033[0m"

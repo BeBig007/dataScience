@@ -1,0 +1,13 @@
+# Environments
+.env
+env/
+ENV/
+
+# Large CSV files
+dataScience_01/customer/*.csv
+dataScience_01/item/*.csv
+dataScience_00/customer/*.csv
+dataScience_00/item/*.csv
+customer/*.csv
+item/*.csv
+data/*.csv

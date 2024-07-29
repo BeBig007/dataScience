@@ -1,8 +1,0 @@
-# Environments
-.env
-env/
-ENV/
-
-# Large CSV files
-customer/*.csv
-item/*.csv

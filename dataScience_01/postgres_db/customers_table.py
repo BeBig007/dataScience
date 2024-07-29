@@ -5,7 +5,6 @@ from datetime import datetime
 
 docker_path = '/docker-entrypoint-initdb.d/'
 data_path = '/data/'
-
 column_types = {
     'event_time': 'TIMESTAMP WITH TIME ZONE',
     'event_type': 'VARCHAR(255)',
@@ -56,6 +55,33 @@ for f in csv_files:
         sql_content += f'COPY {f[:-4]} FROM \'{docker_path}{f}\' DELIMITER \',\' CSV HEADER;\n'
     except ValueError as e:
         print(e)
+
+sql_content += 'CREATE TABLE customers_table AS (\n'
+
+size = len(csv_files)
+for f in csv_files:
+    sql_content += f'SELECT * FROM {f[:-4]}\n'
+    if size > 1:
+        sql_content += 'UNION ALL\n'
+    size -= 1
+sql_content += ');\n'
+
+
+# def union_sql(f):
+    
+#     return f'CREATE TABLE customers (\n\t{sql_col}\n);\n'
+
+# CREATE TABLE customers_table AS (
+# SELECT * FROM data_2022_oct 
+# UNION ALL
+# SELECT * FROM data_2022_nov
+# UNION ALL
+# SELECT * FROM data_2022_dec
+# UNION ALL
+# SELECT * FROM data_2023_jan
+# UNION ALL
+# SELECT * FROM data_2023_feb
+# );
 
 with open('setup.sql', 'w') as table:
     table.write(sql_content)
