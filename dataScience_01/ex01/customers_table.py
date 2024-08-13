@@ -1,10 +1,13 @@
 import csv
+import sys
 from os import listdir
 from os.path import join
 from datetime import datetime
 
 docker_path = '/docker-entrypoint-initdb.d/'
 data_path = '/data/'
+# data_path = './customer/'        # for test purpose
+
 column_types = {
     'event_time': 'TIMESTAMP WITH TIME ZONE',
     'event_type': 'VARCHAR(255)',
@@ -20,13 +23,23 @@ column_types = {
 def is_datetime_column(file_path, column_index=0):
     print(f'Checking if column {column_index} is in DATETIME format...')
     with open(file_path, 'r') as file:
+        total_lines = sum(1 for _ in file) - 1
+
+    with open(file_path, 'r') as file:
         reader = csv.reader(file)
         next(reader)
+        line_count = 0
         for row in reader:
+            line_count += 1
+            progress_percentage = (line_count / total_lines) * 100
+            if line_count % 100 == 0:
+                sys.stdout.write(f'\rProgress: {progress_percentage:.2f}%')
+                sys.stdout.flush()
             try:
                 datetime.strptime(row[column_index], '%Y-%m-%d %H:%M:%S %Z')
             except ValueError:
                 return False
+        print(f'\nAll {line_count} lines are in DATETIME format. Progress: 100%')
     return True
 
 def generate_sql(f):
@@ -56,7 +69,7 @@ for f in csv_files:
     except ValueError as e:
         print(e)
 
-sql_content += 'CREATE TABLE customers_table AS (\n'
+sql_content += 'CREATE TABLE customers AS (\n'
 
 size = len(csv_files)
 for f in csv_files:
@@ -65,23 +78,6 @@ for f in csv_files:
         sql_content += 'UNION ALL\n'
     size -= 1
 sql_content += ');\n'
-
-
-# def union_sql(f):
-    
-#     return f'CREATE TABLE customers (\n\t{sql_col}\n);\n'
-
-# CREATE TABLE customers_table AS (
-# SELECT * FROM data_2022_oct 
-# UNION ALL
-# SELECT * FROM data_2022_nov
-# UNION ALL
-# SELECT * FROM data_2022_dec
-# UNION ALL
-# SELECT * FROM data_2023_jan
-# UNION ALL
-# SELECT * FROM data_2023_feb
-# );
 
 with open('setup.sql', 'w') as table:
     table.write(sql_content)
