@@ -21,7 +21,7 @@ column_types = {
 }
 
 def is_datetime_column(file_path, column_index=0):
-    print(f'Checking if column {column_index} is in DATETIME format...')
+    print(f'\tChecking if column {column_index} is in DATETIME format...')
     with open(file_path, 'r') as file:
         total_lines = sum(1 for _ in file) - 1
 
@@ -81,65 +81,3 @@ sql_content += ');\n'
 
 with open('setup.sql', 'w') as table:
     table.write(sql_content)
-
-
-# SELECT event_time, event_type, product_id, price, user_id, user_session, COUNT(*) AS count 
-# FROM customers 
-# GROUP BY event_time, event_type, product_id, price, user_id, user_session 
-# HAVING COUNT(*)>1;
-
-# 1 045 762
-
-# SELECT * FROM customers WHERE event_time='2023-01-12 12:39:18+00' AND event_type='remove_from_cart' AND product_id='5700082' AND price='16.51' AND user_id='245068553';
-
-
-# DELETE FROM customers
-# WHERE (event_time, event_type, product_id, price, user_id, user_session) IN (
-#   SELECT event_time, event_type, product_id, price, user_id, user_session
-#   FROM customers
-#   GROUP BY event_time, event_type, product_id, price, user_id, user_session
-#   HAVING COUNT(*)>1
-# );
-
-# SELECT 19 583 742 #union
-# SELECT 20 692 840 #union ALL
-# DELETE  2 153 966
-
-# SELECT * FROM data_2023_jan WHERE event_time='2023-01-01 00:01:02+00' AND event_type='remove_from_cart' AND product_id='5850281' AND price='137.78' AND user_id='593016733';
-
-# SELECT *,
-# ROW_NUMBER() OVER (PARTITION BY event_time, event_type, product_id, price, user_id, user_session ORDER BY event_time) AS row_num
-# FROM data_2023_jan;
-
-
-# WITH duplicates AS (
-#   SELECT *,
-#   	ROW_NUMBER() OVER (PARTITION BY event_time, event_type, product_id, price, user_id, user_session ORDER BY event_time) AS row_num
-#   FROM data_2023_jan
-# )
-# DELETE FROM data_2023_jan
-# WHERE (event_time, event_type, product_id, price, user_id, user_session) IN (
-#     SELECT event_time, event_type, product_id, price, user_id, user_session
-#     FROM duplicates
-#     WHERE row_num > 1
-# );
-
-
-# DELETE FROM data_2023_jan
-# WHERE (event_time, event_type, product_id, price, user_id, user_session) IN (
-#     SELECT *, ROW_NUMBER() OVER (PARTITION BY event_time, event_type, product_id, price, user_id, user_session ORDER BY event_time) AS row_num
-#     FROM data_2023_jan
-#     WHERE row_num > 1
-# );
-
-# WITH duplicates AS (
-#     SELECT *,
-#            ROW_NUMBER() OVER (PARTITION BY event_time, event_type, product_id, price, user_id, user_session ORDER BY event_time) AS row_num
-#     FROM data_2023_jan
-# )
-# DELETE FROM data_2023_jan
-# WHERE ctid IN (
-#     SELECT ctid
-#     FROM duplicates
-#     WHERE row_num > 1
-# );

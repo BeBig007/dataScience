@@ -11,3 +11,7 @@ dataScience_00/item/*.csv
 customer/*.csv
 item/*.csv
 data/*.csv
+subject/customer/*.csv
+subject/item/*.csv
+
+subject.zip
