@@ -6,7 +6,7 @@ from datetime import datetime
 
 docker_path = '/docker-entrypoint-initdb.d/'
 data_path = '/data/'
-data_path = './customer/'        for test purpose
+-- data_path = './customer/'        for test purpose
 
 column_types = {
     'event_time': 'TIMESTAMP WITH TIME ZONE',
@@ -48,12 +48,12 @@ def generate_sql(f):
         columns = next(csv.reader(file))
 
     print(f'Processing {f}..., columns: {columns}')
-    if columns[0] != 'event_time':
-        raise ValueError(f"First column of {f} is not 'event_time'")
+    -- if columns[0] != 'event_time':
+    --     raise ValueError(f"First column of {f} is not 'event_time'")
 
     print(f'Checking if event_time is in DATETIME format...')
-    if not is_datetime_column(file_path):
-        raise ValueError(f"Column 'event_time' of {f} is not in DATETIME format")
+    -- if not is_datetime_column(file_path):
+    --     raise ValueError(f"Column 'event_time' of {f} is not in DATETIME format")
 
     sql_col = ',\n\t'.join([f'{col} {column_types.get(col, "VARCHAR")}' for col in columns])
     return f'CREATE TABLE {f[:-4]} (\n\t{sql_col}\n);\n'
@@ -69,13 +69,23 @@ for f in csv_files:
     except ValueError as e:
         print(e)
 
-sql_content += 'CREATE TABLE customers AS (\n'
+sql_content += 'CREATE TABLE customers_all AS (\n'
 
 size = len(csv_files)
 for f in csv_files:
     sql_content += f'SELECT * FROM {f[:-4]}\n'
     if size > 1:
         sql_content += 'UNION ALL\n'
+    size -= 1
+sql_content += ');\n'
+
+sql_content += 'CREATE TABLE customers AS (\n'
+
+size = len(csv_files)
+for f in csv_files:
+    sql_content += f'SELECT * FROM {f[:-4]}\n'
+    if size > 1:
+        sql_content += 'UNION\n'
     size -= 1
 sql_content += ');\n'
 
@@ -102,7 +112,16 @@ HAVING COUNT(*)>1;
 
 -- output: 1 045 762
 
+-- "2022-10-01 00:00:30+00"	"remove_from_cart"	5809103	0.60	429681830	"49e8d843-adf3-428b-a2c3-fe8bc6a307c9"	2
+SELECT * FROM customers WHERE event_time='2022-10-01 00:00:30+00' AND event_type='remove_from_cart' AND product_id='5809103' AND price='0.6' AND user_id='429681830';
+
+-- 5700082	16.51	245068553	"1bdcb724-31d4-4afb-b969-2d9862a96b2f" 29
 SELECT * FROM customers WHERE event_time='2023-01-12 12:39:18+00' AND event_type='remove_from_cart' AND product_id='5700082' AND price='16.51' AND user_id='245068553';
+
+SELECT DISTINCT event_time, event_type, product_id, price, user_id, user_session, COUNT(*) AS count 
+FROM customers 
+GROUP BY event_time, event_type, product_id, price, user_id, user_session 
+HAVING COUNT(*)>1;
 
 -- 
 DELETE FROM customers
@@ -111,7 +130,8 @@ WHERE (event_time, event_type, product_id, price, user_id, user_session) IN (
     FROM customers 
     GROUP BY event_time, event_type, product_id, price, user_id, user_session 
     HAVING COUNT(*)>1;
-);
+)
+RETURNING *;
 
 
 
@@ -135,28 +155,6 @@ WHERE (event_time, event_type, product_id, price, user_id, user_session) IN (
 );
 
 
-DELETE FROM data_2023_jan
-WHERE (event_time, event_type, product_id, price, user_id, user_session) IN (
-    SELECT *, ROW_NUMBER() OVER (PARTITION BY event_time, event_type, product_id, price, user_id, user_session ORDER BY event_time) AS row_num
-    FROM data_2023_jan
-    WHERE row_num > 1
-);
-
-WITH duplicates AS (
-    SELECT *,
-        ROW_NUMBER() OVER (
-            PARTITION BY event_time, event_type, product_id, price, user_id, user_session ORDER BY event_time
-        ) AS row_num
-    FROM customers
-)
-DELETE FROM data_2023_jan
-WHERE ctid IN (
-    SELECT ctid
-    FROM duplicates
-    WHERE row_num > 1
-);
-
-
 SELECT *, ctid FROM customers LIMIT 20;
 
 WITH duplicates AS (
@@ -175,3 +173,11 @@ WITH duplicates AS (
 SELECT COUNT(*) FROM public.customers c
 INTERSECT
 SELECT COUNT(*) FROM duplicates d;
+
+
+DELETE FROM public.customers_all
+WHERE ctid NOT IN (
+    SELECT MIN(ctid)
+    FROM public.customers_all
+    GROUP BY event_time, event_type, product_id, price, user_id, user_session
+);
