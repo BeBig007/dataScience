@@ -4,6 +4,8 @@ env/
 ENV/
 
 # Large CSV files
+dataScience_02/customer/*.csv
+dataScience_02/item/*.csv
 dataScience_01/customer/*.csv
 dataScience_01/item/*.csv
 dataScience_00/customer/*.csv

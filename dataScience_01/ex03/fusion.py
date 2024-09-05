@@ -46,12 +46,12 @@ def generate_sql(f):
         columns = next(csv.reader(file))
 
     print(f'Processing {f}...')
-    # if columns[0] != 'event_time':
-    #     raise ValueError(f"First column of {f} is not 'event_time'")
+    if columns[0] != 'event_time':
+        raise ValueError(f"First column of {f} is not 'event_time'")
 
     print(f'Checking if event_time is in DATETIME format...')
-    # if not is_datetime_column(file_path):
-    #     raise ValueError(f"Column 'event_time' of {f} is not in DATETIME format")
+    if not is_datetime_column(file_path):
+        raise ValueError(f"Column 'event_time' of {f} is not in DATETIME format")
 
     sql_col = ',\n\t'.join([f'{col} {column_types.get(col, "VARCHAR")}' for col in columns])
     return f'CREATE TABLE {f[:-4]} (\n\t{sql_col}\n);\n\n'
