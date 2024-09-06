@@ -1,0 +1,20 @@
+
+-- UNION: 19 583 742
+19583742
+-- UNION ALL: 20 692 840
+20692840
+
+--should delete 1 109 098 rows
+1109098
+
+-- show rows with duplicates
+SELECT DISTINCT * FROM customers;
+
+SELECT event_type, COUNT(*) AS count 
+FROM customers 
+GROUP BY event_type;
+
+ cart             | 5652991
+ purchase         | 1286102
+ remove_from_cart | 2987859
+ view             | 9656790

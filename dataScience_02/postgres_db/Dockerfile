@@ -1,9 +1,14 @@
 FROM postgres:16.3
 
-RUN apt-get update && apt-get install -y python3 python3-pip
+RUN apt-get update \
+    && apt-get install -y python3 python3-pip python3-psycopg2 python3-matplotlib python3-pandas
 
 COPY ../customer/* data/customer/
 COPY ../item/* data/
+
+COPY postgres_db/connect_db.py .
+COPY postgres_db/database.ini .
+COPY postgres_db/pie.py .
 
 COPY postgres_db/init_sql.py data/
 RUN python3 /data/init_sql.py
