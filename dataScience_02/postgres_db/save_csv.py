@@ -26,16 +26,75 @@ def connect(config):
         print(error)
 
 
-def export_to_csv():
+def export_to_csv_nb_customers():
     """ Export the sum_event_type table to a CSV file """
-    command = """ COPY (SELECT * FROM customers WHERE event_type='purchase') TO STDOUT WITH CSV HEADER; """
+    command = """
+    COPY (
+        SELECT
+            DATE(event_time) AS date,
+            COUNT(DISTINCT user_id) AS num_customers
+        FROM customers
+        WHERE event_type='purchase'
+        GROUP BY DATE(event_time)
+        ORDER BY DATE(event_time)
+    ) TO STDOUT WITH CSV HEADER;
+    """
     try:
         config = load_config()
         with psycopg2.connect(**config) as conn:
             with conn.cursor() as cur:
-                with open('out.csv', 'w') as f:
+                with open('out_nb_customers.csv', 'w') as f:
                     cur.copy_expert(command, f)
-        print("Data exported successfully to out.csv.\n")
+        print("Data exported successfully to out_nb_customers.csv.\n")
+    except (psycopg2.DatabaseError, Exception) as error:
+        print(f"Error: {error}")
+
+
+def export_to_csv_sales_by_month():
+    """ """
+    command = """
+    COPY (
+        SELECT 
+            SUM(price) / 1000000 AS num_sales,
+            EXTRACT (MONTH FROM event_time) AS MONTH,
+            EXTRACT (YEAR FROM event_time) AS YEAR
+        FROM customers
+        WHERE event_type='purchase'
+        GROUP BY EXTRACT(YEAR FROM event_time), EXTRACT(MONTH FROM event_time)
+        ORDER BY EXTRACT(YEAR FROM event_time), EXTRACT(MONTH FROM event_time)
+    ) TO STDOUT WITH CSV HEADER;
+    """
+    try:
+        config = load_config()
+        with psycopg2.connect(**config) as conn:
+            with conn.cursor() as cur:
+                with open('out_sales_by_month.csv', 'w') as f:
+                    cur.copy_expert(command, f)
+        print("Data exported successfully to out_sales_by_month.csv.\n")
+    except (psycopg2.DatabaseError, Exception) as error:
+        print(f"Error: {error}")
+
+
+def export_to_csv_average_spend():
+    """ """
+    command = """
+    COPY (
+        SELECT
+            DATE(event_time) AS date,
+            SUM(price)/COUNT(DISTINCT user_id) AS tot_sales
+        FROM customers
+        WHERE event_type='purchase'
+        GROUP BY DATE(event_time)
+        ORDER BY DATE(event_time)
+    ) TO STDOUT WITH CSV HEADER;
+    """
+    try:
+        config = load_config()
+        with psycopg2.connect(**config) as conn:
+            with conn.cursor() as cur:
+                with open('out_average_spend.csv', 'w') as f:
+                    cur.copy_expert(command, f)
+        print("Data exported successfully to out_average_spend.csv.\n")
     except (psycopg2.DatabaseError, Exception) as error:
         print(f"Error: {error}")
 
@@ -43,68 +102,8 @@ def export_to_csv():
 if __name__ == '__main__':
     config = load_config()
     connect(config)
-    export_to_csv()
+    export_to_csv_nb_customers()
+    export_to_csv_sales_by_month()
+    export_to_csv_average_spend()
 
 #################################################################
-
-# SELECT *  FROM customers 
-# WHERE event_type='purchase'
-# 1286102
-
-
-# SELECT DISTINCT user_id FROM customers
-# WHERE event_type='purchase' AND event_time BETWEEN '2022-10-01' AND '2022-10-02';
-# SELECT DISTINCT user_id FROM customers
-# WHERE event_type='purchase' AND event_time BETWEEN '2022-10-01 00:00:00' AND '2022-10-01 23:59:59';
-# 1001
-
-# SELECT DISTINCT user_id FROM customers
-# WHERE event_type='purchase' AND event_time BETWEEN '2022-10-02' AND '2022-10-03';
-# 1045 rows
-
-# SELECT DISTINCT user_id FROM customers
-# WHERE event_type='purchase' AND event_time BETWEEN '2022-10-03' AND '2022-10-04';
-# 1048
-
-
-# def create_tables():
-#     """ Create tables in the PostgreSQL database """
-#     command = """
-#         CREATE TABLE IF NOT EXISTS customer_count (
-#             event_time IMESTAMP WITH TIME ZONE PRIMARY KEY,
-#             user_id BIGINT
-#         )
-#         """
-#     try:
-#         config = load_config()
-#         with psycopg2.connect(**config) as conn:
-#             with conn.cursor() as cur:
-#                 cur.execute(command)
-#                 conn.commit()
-#         print("Table created successfully.\n")
-#     except (psycopg2.DatabaseError, Exception) as error:
-#         print(error)
-
-
-# def insert_event_type_counts():
-#     """ Insert event_type and their counts from customers into customer_count """
-#     select_command = """
-#         SELECT * FROM customers WHERE event_type='purchase'
-#         GROUP BY event_time, user_id;
-#     """
-#     insert_command = """
-#         INSERT INTO customer_count(event_time, user_id)
-#         VALUES (%s, %s);
-#     """
-#     try:
-#         config = load_config()
-#         with psycopg2.connect(**config) as conn:
-#             with conn.cursor() as cur:
-#                 cur.execute(select_command)
-#                 rows = cur.fetchall()
-#                 for row in rows:
-#                     cur.execute(insert_command, row)
-#                 conn.commit()
-#         print("Data inserted/updated successfully in customer_count.\n")
-#     except (psycopg2.DatabaseError, Exception) as error:
-#         print(f"Error: {error}")

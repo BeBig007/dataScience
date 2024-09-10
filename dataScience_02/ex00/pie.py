@@ -8,7 +8,7 @@ def load(path: str) -> pd.DataFrame:
     try:
         assert isinstance(path, str), "the input must be string"
         data = pd.read_csv(path)
-        print(f"Loading {path} dataset of type {data.dtypes}\n")
+        print(f"Loading {path} dataset of type:\n{data.dtypes}\n")
         return data
 
     except AssertionError as msg:
