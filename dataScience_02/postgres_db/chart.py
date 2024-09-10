@@ -105,4 +105,4 @@ if __name__ == '__main__':
 # psql -U bebigel -d piscineds -h localhost
 # 1286102 rows
 
-# docker cp postgres:nb_customers_chart.png dataScience_02/ex02 && docker cp postgres:total_sales_chart.png dataScience_02/ex02 && docker cp postgres:average_spend_chart.png dataScience_02/ex02
+# docker cp postgres:nb_customers_chart.png dataScience_02/ex01 && docker cp postgres:total_sales_chart.png dataScience_02/ex01 && docker cp postgres:average_spend_chart.png dataScience_02/ex01
