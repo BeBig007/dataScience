@@ -82,7 +82,7 @@ def chart_average_spend(data: pd.DataFrame):
         plt.ylabel('average spend/customers in ₳')
         plt.tick_params(length=0)
         plt.margins(x=0)
-        plt.fill_between(data['date'], 0, data['tot_sales'], alpha=0.7)
+        plt.fill_between(data['date'], 0, data['tot_sales'])
         plt.savefig('average_spend_chart.png')
         print('Third plot created !\n')
 
@@ -102,5 +102,6 @@ if __name__ == '__main__':
     av_spend = load('out_average_spend.csv')
     chart_average_spend(av_spend)
 
-# 1286102 rows
+# psql -U bebigel -d piscineds -h localhost
+
 # docker cp postgres:nb_customers_chart.png dataScience_02/ex01 && docker cp postgres:total_sales_chart.png dataScience_02/ex01 && docker cp postgres:average_spend_chart.png dataScience_02/ex01

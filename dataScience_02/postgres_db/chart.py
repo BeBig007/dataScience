@@ -19,22 +19,40 @@ def load(path: str) -> pd.DataFrame:
     return None
 
 
-def chart_nb_customers(data: pd.DataFrame):
+def chart_box_plot(data: pd.DataFrame):
     """ Create a chart from the data """
     plt.style.use('ggplot')
     try:
         assert isinstance(data, pd.DataFrame), "arg must be a dataframe"
         print(data)
         plt.figure()
-        plt.plot(data['date'], data['num_customers'])
-        x_ticks = ['2022-10-01', '2022-11-01', '2022-12-01', '2023-01-01', '2023-02-01']
-        x_ticks_labels = ['Oct', 'Nov', 'Dec', 'Jan', 'Feb']
-        plt.xticks(ticks=x_ticks, labels=x_ticks_labels)
-        plt.ylabel('Number of customers')
-        plt.margins(x=0, y=0.05)
-        plt.tick_params(length=0)
-        plt.savefig('nb_customers_chart.png')
-        print('Fist plot created !\n')
+        box = plt.boxplot(data, vert=False, patch_artist=True, boxprops=dict(facecolor='lightgreen'))
+        plt.xlabel('price')
+        plt.yticks([])
+        plt.margins(x=0.05,y=-0.4)
+        plt.savefig('box_plot_chart.png')
+
+        stats = {}
+        stats['count'] = data['price'].count()
+        stats['mean'] = data['price'].mean()
+        stats['std'] = data['price'].std()
+        stats['min'] = data['price'].min()
+        stats['25%'] = data['price'].quantile(0.25)
+        stats['50%'] = data['price'].quantile(0.50)
+        stats['75%'] = data['price'].quantile(0.75)
+        stats['max'] = data['price'].max()
+        
+        print()
+        print(f"count\t {stats['count']:.6f}")
+        print(f"mean\t {stats['mean']:.6f}")
+        print(f"std\t {stats['std']:.6f}")
+        print(f"min\t {stats['min']:.6f}")
+        print(f"25%\t {stats['25%']:.6f}")
+        print(f"50%\t {stats['50%']:.6f}")
+        print(f"75%\t {stats['75%']:.6f}")
+        print(f"max\t {stats['max']:.6f}")
+        print()
+        print('Box plot created !\n')
 
     except AssertionError as msg:
         print(f"AssertionError: {msg}")
@@ -42,23 +60,19 @@ def chart_nb_customers(data: pd.DataFrame):
         print(f"Error: {error}")
 
 
-def chart_total_sales(data: pd.DataFrame):
+def chart_box_no_outlier_plot(data: pd.DataFrame):
     """ Create a chart from the data """
     plt.style.use('ggplot')
     try:
         assert isinstance(data, pd.DataFrame), "arg must be a dataframe"
-        print(data)
-        data['month'] = data['month'].astype(str)
+        # print(data)
         plt.figure()
-        plt.bar(data['month'], data['num_sales'])
-        x_ticks = ['10', '11', '12', '1', '2']
-        x_ticks_labels = ['Oct', 'Nov', 'Dec', 'Jan', 'Feb']
-        plt.xticks(ticks=x_ticks, labels=x_ticks_labels)
-        plt.ylabel('total sales in million of ₳')
-        plt.xlabel('month')
-        plt.tick_params(length=0)
-        plt.savefig('total_sales_chart.png')
-        print('Second plot created !\n')
+        box = plt.boxplot(data, sym='', vert=False, patch_artist=True, boxprops=dict(facecolor='lightgreen'))
+        plt.xlabel('price')
+        plt.yticks([])
+        plt.margins(x=0.05,y=-0.4)
+        plt.savefig('chart_box_no_outlier_plot.png')
+        print('Box plot without outliers created !\n')
 
     except AssertionError as msg:
         print(f"AssertionError: {msg}")
@@ -66,25 +80,19 @@ def chart_total_sales(data: pd.DataFrame):
         print(f"Error: {error}")
 
 
-def chart_average_spend(data: pd.DataFrame):
+def chart_box_plot_av_basket(data: pd.DataFrame):
     """ Create a chart from the data """
     plt.style.use('ggplot')
     try:
         assert isinstance(data, pd.DataFrame), "arg must be a dataframe"
         print(data)
         plt.figure()
-        plt.plot(data['date'], data['tot_sales'])
-        x_ticks = ['2022-10-01', '2022-11-01', '2022-12-01', '2023-01-01', '2023-02-01']
-        x_ticks_labels = ['Oct', 'Nov', 'Dec', 'Jan', 'Feb']
-        plt.xticks(ticks=x_ticks, labels=x_ticks_labels)
-        y_ticks = np.arange(0, data['tot_sales'].max() + 1, 5)
-        plt.yticks(y_ticks)
-        plt.ylabel('average spend/customers in ₳')
-        plt.tick_params(length=0)
-        plt.margins(x=0)
-        plt.fill_between(data['date'], 0, data['tot_sales'], alpha=0.7)
-        plt.savefig('average_spend_chart.png')
-        print('Third plot created !\n')
+        box = plt.boxplot(data, vert=False, patch_artist=True, boxprops=dict(facecolor='lightblue'))
+        plt.xlabel('price')
+        plt.yticks([])
+        plt.margins(x=0.05,y=-0.45)
+        plt.savefig('average_basket_chart.png')
+        print('Box plot average basket created !\n')
 
     except AssertionError as msg:
         print(f"AssertionError: {msg}")
@@ -93,16 +101,14 @@ def chart_average_spend(data: pd.DataFrame):
 
 
 if __name__ == '__main__':
-    data = load("out_nb_customers.csv")
-    chart_nb_customers(data)
+    data = load("out_price.csv")
+    chart_box_plot(data)
+    chart_box_no_outlier_plot(data)
     
-    sales = load("out_sales_by_month.csv")
-    chart_total_sales(sales)
-    
-    av_spend = load('out_average_spend.csv')
-    chart_average_spend(av_spend)
+    average_basket = load("out_average_price.csv")
+    chart_box_plot_av_basket(average_basket)
+
 
 # psql -U bebigel -d piscineds -h localhost
-# 1286102 rows
 
-# docker cp postgres:nb_customers_chart.png dataScience_02/ex01 && docker cp postgres:total_sales_chart.png dataScience_02/ex01 && docker cp postgres:average_spend_chart.png dataScience_02/ex01
+# docker cp postgres:box_plot_chart.png ex02 && docker cp postgres:chart_box_no_outlier_plot.png ex02 && docker cp postgres:average_basket_chart.png ex02

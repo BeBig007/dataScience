@@ -43,4 +43,4 @@ if __name__ == '__main__':
 
 # psql -U bebigel -d piscineds -h localhost
 
-# docker cp postgres:pie_chart.png ex00 && open ex00/pie_chart.png
+# docker cp postgres:pie_chart.png ex00/
