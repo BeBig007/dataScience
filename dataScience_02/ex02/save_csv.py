@@ -26,37 +26,28 @@ def connect(config):
         print(error)
 
 
-def export_to_csv_frequency():
+def export_to_csv_box_plot():
     """ Export the sum_event_type table to a CSV file """
     command = """
     COPY (
-        WITH cte_freq AS (
-            SELECT
-                user_id,
-                COUNT(event_type) AS total_order
-            FROM customers
-            WHERE event_type='purchase'
-            GROUP BY user_id
-        )
-        SELECT 10 * s.d, COUNT(c.total_order)
-        FROM generate_series(0, 3) s(d)
-        LEFT OUTER JOIN cte_freq c ON s.d=FLOOR(c.total_order / 10)
-        GROUP BY s.d
-        ORDER BY s.d
+        SELECT price
+        FROM customers
+        WHERE event_type='purchase'
+        ORDER BY price
     ) TO STDOUT WITH CSV HEADER;
     """
     try:
         config = load_config()
         with psycopg2.connect(**config) as conn:
             with conn.cursor() as cur:
-                with open('out_freq.csv', 'w') as f:
+                with open('out_price.csv', 'w') as f:
                     cur.copy_expert(command, f)
-        print("Data exported successfully to out_freq.csv.\n")
+        print("Data exported successfully to out_price.csv.\n")
     except (psycopg2.DatabaseError, Exception) as error:
         print(f"Error: {error}")
 
 
-def export_to_csv_monetary():
+def export_to_csv_average_price():
     """ Export the sum_event_type table to a CSV file """
     command = """
     COPY (
@@ -74,9 +65,9 @@ def export_to_csv_monetary():
         config = load_config()
         with psycopg2.connect(**config) as conn:
             with conn.cursor() as cur:
-                with open('out_monetary.csv', 'w') as f:
+                with open('out_average_price.csv', 'w') as f:
                     cur.copy_expert(command, f)
-        print("Data exported successfully to out_monetary.csv.\n")
+        print("Data exported successfully to out_average_price.csv.\n")
     except (psycopg2.DatabaseError, Exception) as error:
         print(f"Error: {error}")
 
@@ -84,8 +75,8 @@ def export_to_csv_monetary():
 if __name__ == '__main__':
     config = load_config()
     connect(config)
-    export_to_csv_frequency()
-    export_to_csv_monetary()
+    export_to_csv_box_plot()
+    export_to_csv_average_price()
 
 
 #################################################################
