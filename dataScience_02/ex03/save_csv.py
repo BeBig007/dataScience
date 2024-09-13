@@ -82,3 +82,39 @@ if __name__ == '__main__':
 
 
 #################################################################
+# command = """
+# COPY (
+#     WITH cte_freq AS (
+#         SELECT
+#             user_id,
+#             COUNT(event_type) AS total_order
+#         FROM customers
+#         WHERE event_type='purchase'
+#         GROUP BY user_id
+#     )
+#     SELECT 10 * s.d AS dist, COUNT(c.total_order)
+#     FROM generate_series(0, 4) s(d)
+#     LEFT OUTER JOIN cte_freq c ON s.d=FLOOR(c.total_order / 10)
+#     GROUP BY s.d
+#     ORDER BY s.d
+# ) TO STDOUT WITH CSV HEADER;
+# """
+
+# command = """
+# COPY (
+#     WITH cte_freq AS (
+#         SELECT
+#             user_id,
+#             SUM(price) AS total_price
+#         FROM customers
+#         WHERE event_type='purchase'
+#         GROUP BY user_id
+#     )
+#     SELECT 10 * s.d AS dist, COUNT(c.total_price)
+#     FROM generate_series(0, 20, 5) s(d)
+#     LEFT OUTER JOIN cte_freq c ON s.d=FLOOR(c.total_price / 50)
+#     GROUP BY s.d
+#     ORDER BY s.d
+# ) TO STDOUT WITH CSV HEADER;
+# """
+#################################################################
