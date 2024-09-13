@@ -26,50 +26,20 @@ def connect(config):
         print(error)
 
 
-def export_to_csv_frequency():
+def export_to_csv():
     """ Export the sum_event_type table to a CSV file """
     command = """
     COPY (
-        SELECT
-            user_id,
-            COUNT(event_type) AS total_order
-        FROM customers
-        WHERE event_type='purchase'
-        GROUP BY user_id
-        HAVING COUNT(event_type) < 40
+        SELECT * FROM customers
     ) TO STDOUT WITH CSV HEADER;
     """
     try:
         config = load_config()
         with psycopg2.connect(**config) as conn:
             with conn.cursor() as cur:
-                with open('out_freq.csv', 'w') as f:
+                with open('out.csv', 'w') as f:
                     cur.copy_expert(command, f)
-        print("Data exported successfully to out_freq.csv.\n")
-    except (psycopg2.DatabaseError, Exception) as error:
-        print(f"Error: {error}")
-
-
-def export_to_csv_monetary():
-    """ Export the sum_event_type table to a CSV file """
-    command = """
-    COPY (
-        SELECT
-            user_id,
-            SUM(price) AS total_price
-        FROM customers
-        WHERE event_type='purchase'
-        GROUP BY user_id
-        HAVING SUM(price) < 250
-    ) TO STDOUT WITH CSV HEADER;
-    """
-    try:
-        config = load_config()
-        with psycopg2.connect(**config) as conn:
-            with conn.cursor() as cur:
-                with open('out_monetary.csv', 'w') as f:
-                    cur.copy_expert(command, f)
-        print("Data exported successfully to out_monetary.csv.\n")
+        print("Data exported successfully to out.csv.\n")
     except (psycopg2.DatabaseError, Exception) as error:
         print(f"Error: {error}")
 
@@ -77,8 +47,7 @@ def export_to_csv_monetary():
 if __name__ == '__main__':
     config = load_config()
     connect(config)
-    export_to_csv_frequency()
-    export_to_csv_monetary()
+    export_to_csv()
 
 
 #################################################################
