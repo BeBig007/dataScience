@@ -1,7 +1,7 @@
 FROM postgres:16.3
 
 RUN apt-get update \
-    && apt-get install -y python3 python3-pip python3-psycopg2 python3-matplotlib python3-pandas vim
+    && apt-get install -y python3 python3-pip python3-psycopg2 python3-matplotlib python3-pandas vim python3-seaborn python3-sklearn
 
 COPY ../customer/* data/customer/
 COPY ../item/* data/

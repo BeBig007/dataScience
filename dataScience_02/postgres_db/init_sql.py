@@ -82,26 +82,26 @@ sql_content += ');\n\n'
 # sql_content += 'TRUNCATE customers;\n'
 # sql_content += 'INSERT INTO customers SELECT * FROM no_duplicates;\n\n'
 
-# Create item table
-sql_content += 'CREATE TABLE item (\n'
-sql_content += '\tproduct_id INTEGER,\n'
-sql_content += '\tcategory_id BIGINT,\n'
-sql_content += '\tcategory_code VARCHAR(255),\n'
-sql_content += '\tbrand VARCHAR(100)\n'
-sql_content += ');\n\n'
-sql_content += f'COPY item FROM \'{docker_path}item.csv\' DELIMITER \',\' CSV HEADER;\n\n'
+# # Create item table
+# sql_content += 'CREATE TABLE item (\n'
+# sql_content += '\tproduct_id INTEGER,\n'
+# sql_content += '\tcategory_id BIGINT,\n'
+# sql_content += '\tcategory_code VARCHAR(255),\n'
+# sql_content += '\tbrand VARCHAR(100)\n'
+# sql_content += ');\n\n'
+# sql_content += f'COPY item FROM \'{docker_path}item.csv\' DELIMITER \',\' CSV HEADER;\n\n'
 
-# Add columns to customers table
-sql_content += 'ALTER TABLE customers\n'
-sql_content += 'ADD COLUMN category_id BIGINT,\n'
-sql_content += 'ADD COLUMN category_code VARCHAR(255),\n'
-sql_content += 'ADD COLUMN brand VARCHAR(100);\n\n'
+# # Add columns to customers table
+# sql_content += 'ALTER TABLE customers\n'
+# sql_content += 'ADD COLUMN category_id BIGINT,\n'
+# sql_content += 'ADD COLUMN category_code VARCHAR(255),\n'
+# sql_content += 'ADD COLUMN brand VARCHAR(100);\n\n'
 
-# update customers table with item table
-sql_content += 'UPDATE customers\n'
-sql_content += 'SET category_id = item.category_id, category_code = item.category_code, brand = item.brand\n'
-sql_content += 'FROM item\n'
-sql_content += 'WHERE customers.product_id = item.product_id;\n\n'
+# # update customers table with item table
+# sql_content += 'UPDATE customers\n'
+# sql_content += 'SET category_id = item.category_id, category_code = item.category_code, brand = item.brand\n'
+# sql_content += 'FROM item\n'
+# sql_content += 'WHERE customers.product_id = item.product_id;\n\n'
 
 with open('setup.sql', 'w') as table:
     table.write(sql_content)
