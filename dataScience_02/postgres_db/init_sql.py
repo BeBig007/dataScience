@@ -77,11 +77,6 @@ for f in csv_files:
     size -= 1
 sql_content += ');\n\n'
 
-# Remove duplicates
-# sql_content += 'CREATE TEMPORARY TABLE no_duplicates AS SELECT DISTINCT * FROM customers;\n'
-# sql_content += 'TRUNCATE customers;\n'
-# sql_content += 'INSERT INTO customers SELECT * FROM no_duplicates;\n\n'
-
 # # Create item table
 # sql_content += 'CREATE TABLE item (\n'
 # sql_content += '\tproduct_id INTEGER,\n'

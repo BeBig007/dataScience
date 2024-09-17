@@ -51,24 +51,3 @@ if __name__ == '__main__':
     config = load_config()
     connect(config)
     export_to_csv()
-
-
-#################################################################
-
-# SELECT user_id, COUNT(*) AS purchases
-# FROM customers
-# WHERE event_type = 'purchase'
-# GROUP BY user_id
-# HAVING COUNT(*) < 100
-# ORDER BY purchases DESC
-
-
-        # SELECT 
-        #     event_type, product_id, price, user_id, user_session,
-        #     DATE(event_time) AS date, 
-        #     ROUND(EXTRACT(HOUR FROM event_time) + EXTRACT(MINUTE FROM event_time) / 60.0, 1) AS decimal_time
-        # FROM customers
-        # WHERE event_type='purchase'
-        # ORDER BY decimal_time
-
-#################################################################
