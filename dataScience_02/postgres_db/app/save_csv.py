@@ -31,7 +31,7 @@ def export_to_csv():
     """ Export the sum_event_type table to a CSV file """
     command = """
     COPY (
-        SELECT *
+        SELECT event_time, event_type, price, user_id, user_session
         FROM customers
     ) TO STDOUT WITH CSV HEADER;
     """
@@ -39,9 +39,9 @@ def export_to_csv():
         config = load_config()
         with psycopg2.connect(**config) as conn:
             with conn.cursor() as cur:
-                with open('out.csv', 'w') as f:
+                with open('raw_data.csv', 'w') as f:
                     cur.copy_expert(command, f)
-        print("Data exported successfully to out.csv.\n")
+        print("Data exported successfully to raw_data.csv.\n")
 
     except (psycopg2.DatabaseError, Exception) as error:
         print(f"Error: {error}")
