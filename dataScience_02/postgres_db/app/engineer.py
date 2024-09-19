@@ -18,7 +18,7 @@ def load(path: str) -> pd.DataFrame:
     return None
 
 
-def remouve_outliers(data: pd.DataFrame) -> pd.DataFrame:
+def remove_outliers(data: pd.DataFrame) -> pd.DataFrame:
     """ Remove outliers from the dataset. """
     try:
         assert isinstance(data, pd.DataFrame), "arg must be a dataframe"
@@ -26,15 +26,13 @@ def remouve_outliers(data: pd.DataFrame) -> pd.DataFrame:
 
         z_scores_purchases = stats.zscore(data['purchases'])
         z_scores_total_spent = stats.zscore(data['total_spent'])
-        z_scores_views = stats.zscore(data['views'])
-        z_scores_cart_adds = stats.zscore(data['cart_adds'])
+        z_scores_sessions = stats.zscore(data['sessions'])
 
         seuil = 3
 
         data = data[(z_scores_purchases < seuil) & (z_scores_purchases > -seuil) &
                     (z_scores_total_spent < seuil) & (z_scores_total_spent > -seuil) &
-                    (z_scores_views < seuil) & (z_scores_views > -seuil) &
-                    (z_scores_cart_adds < seuil) & (z_scores_cart_adds > -seuil)]
+                    (z_scores_sessions < seuil) & (z_scores_sessions > -seuil)]
         return data
 
     except AssertionError as msg:
@@ -75,18 +73,20 @@ def featuring_data(raw_data: pd.DataFrame) -> pd.DataFrame:
         print(customer_data.head(50))
         print()
 
-        # data = remouve_outliers(customer_data)
-        # print("Outliers removed from the dataset.\n")
+        data = remove_outliers(customer_data)
+        print("Outliers removed from the dataset.\n")
 
-        # desc = data.describe()
-        desc = customer_data.describe()
+        desc = data.describe()
+        # desc = customer_data.describe()
         print("Descriptive statistics of the data:")
         print(desc.to_string(formatters={'purchases': '{:.2f}'.format,
                                 'total_spent': '{:.2f}'.format,
+                                'average_spent': '{:.2f}'.format,
                                 'sessions': '{:.2f}'.format,
                                 'recency': '{:.2f}'.format}))
         print()
 
+        # customer_data.to_csv("customer_data.csv")
         data.to_csv("customer_data.csv")
         print("Dataset saved to 'customer_data.csv'.\n")
         return pd.DataFrame(data, columns=data.columns)

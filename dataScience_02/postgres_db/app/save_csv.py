@@ -31,8 +31,17 @@ def export_to_csv():
     """ Export the sum_event_type table to a CSV file """
     command = """
     COPY (
-        SELECT event_time, event_type, price, user_id, user_session
+        SELECT
+            COUNT(DISTINCT EXTRACT(MONTH FROM event_time)) AS month_with_purchase_count,
+            CASE
+                WHEN EXTRACT(MONTH FROM MIN(event_time)) = 1 THEN 13
+                WHEN EXTRACT(MONTH FROM MIN(event_time)) = 2 THEN 14
+                ELSE EXTRACT(MONTH FROM MIN(event_time))
+            END AS first_purchase_month
         FROM customers
+        WHERE event_type = 'purchase'
+        GROUP BY user_id
+        ORDER BY first_purchase_month
     ) TO STDOUT WITH CSV HEADER;
     """
     try:
@@ -47,6 +56,7 @@ def export_to_csv():
         print(f"Error: {error}")
 
 
+
 if __name__ == '__main__':
     config = load_config()
     connect(config)
@@ -54,6 +64,9 @@ if __name__ == '__main__':
 
 
 #################################################################
+
+        # SELECT event_time, event_type, price, user_id, user_session
+        # FROM customers
 
 # SELECT user_id, COUNT(*) AS purchases
 # FROM customers
