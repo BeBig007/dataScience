@@ -34,30 +34,28 @@ def export_to_csv():
         WITH purchases AS (
             SELECT
                 user_id,
-                COUNT(*) AS total_purchases,
-                COUNT(DISTINCT EXTRACT(MONTH FROM event_time)) AS month_with_purchase,
-                MIN(event_time) AS first_purchase_time,
-                MAX(event_time) AS last_purchase_time
+                COUNT(product_id) AS frequency,
+                SUM(price) AS total_spent
+            FROM customers
+            WHERE event_type = 'purchase'
+            GROUP BY user_id
+        ),
+        recency AS (
+            SELECT
+                user_id,
+                (EXTRACT(DAY FROM (DATE '2023-03-01' - MAX(event_time)))) / 30.2 AS recency
             FROM customers
             WHERE event_type = 'purchase'
             GROUP BY user_id
         )
+
         SELECT
-            total_purchases / COUNT(DISTINCT user_id) AS purchase_frequency,
-            month_with_purchase,
-            CASE
-                WHEN EXTRACT(MONTH FROM first_purchase_time) = 1 THEN 13
-                WHEN EXTRACT(MONTH FROM first_purchase_time) = 2 THEN 14
-                ELSE EXTRACT(MONTH FROM first_purchase_time)
-            END AS first_purchase_month,
-            CASE
-                WHEN EXTRACT(MONTH FROM last_purchase_time) = 1 THEN 13
-                WHEN EXTRACT(MONTH FROM last_purchase_time) = 2 THEN 14
-                ELSE EXTRACT(MONTH FROM last_purchase_time)
-            END AS last_purchase_month
-        FROM purchases
-        GROUP BY user_id, total_purchases, month_with_purchase, first_purchase_time, last_purchase_time
-        ORDER BY first_purchase_month
+            p.frequency,
+            p.total_spent,
+            r.recency
+        FROM purchases p
+        JOIN recency r
+        ON p.user_id = r.user_id
     ) TO STDOUT WITH CSV HEADER;
     """
     try:
@@ -110,5 +108,33 @@ if __name__ == '__main__':
         # FROM customers
         # WHERE event_type='purchase'
         # ORDER BY decimal_time
+        
+        # WITH purchases AS (
+        #     SELECT
+        #         user_id,
+        #         COUNT(*) AS total_purchases,
+        #         COUNT(DISTINCT EXTRACT(MONTH FROM event_time)) AS month_with_purchase,
+        #         MIN(event_time) AS first_purchase_time,
+        #         MAX(event_time) AS last_purchase_time
+        #     FROM customers
+        #     WHERE event_type = 'purchase'
+        #     GROUP BY user_id
+        # )
+        # SELECT
+        #     total_purchases / COUNT(DISTINCT user_id) AS purchase_frequency,
+        #     month_with_purchase,
+        #     CASE
+        #         WHEN EXTRACT(MONTH FROM first_purchase_time) = 1 THEN 13
+        #         WHEN EXTRACT(MONTH FROM first_purchase_time) = 2 THEN 14
+        #         ELSE EXTRACT(MONTH FROM first_purchase_time)
+        #     END AS first_purchase_month,
+        #     CASE
+        #         WHEN EXTRACT(MONTH FROM last_purchase_time) = 1 THEN 13
+        #         WHEN EXTRACT(MONTH FROM last_purchase_time) = 2 THEN 14
+        #         ELSE EXTRACT(MONTH FROM last_purchase_time)
+        #     END AS last_purchase_month
+        # FROM purchases
+        # GROUP BY user_id, total_purchases, month_with_purchase, first_purchase_time, last_purchase_time
+        # ORDER BY first_purchase_month
 
 #################################################################

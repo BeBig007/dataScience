@@ -5,6 +5,7 @@ ENV/
 
 # config files
 dataScience_02/postgres_db/database.ini
+dataScience_01/postgres_db/app/database.ini
 
 # Large CSV files
 dataScience_02/customer/*.csv
