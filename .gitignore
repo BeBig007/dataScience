@@ -20,4 +20,6 @@ data/*.csv
 subject/customer/*.csv
 subject/item/*.csv
 
+dataScience_03/data/*.csv
+
 subject.zip
