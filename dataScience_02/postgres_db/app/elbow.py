@@ -37,9 +37,7 @@ def featuring_data(data: pd.DataFrame) -> pd.DataFrame:
             'total_spent': total_spent,     # total amount spent by each customer
             'sessions': total_sessions      # total sessions made by each customer
         }).fillna(0)
-        print("Features extracted customer_data:")
-        print(customer_data.head())
-        print()
+        print("Features extracted\n")
 
         scaler = StandardScaler()
         customer_data_scaled = scaler.fit_transform(customer_data)
@@ -65,7 +63,6 @@ def kmean_clustering(data: pd.DataFrame):
             kmeans.fit(data)
             wcss.append(kmeans.inertia_)
         print("K-means clustering completed.\n")
-        print("wcss: ", wcss)
 
         plt.plot(range(1, 11), wcss, marker = '+')
         plt.title('The Elbow Method')

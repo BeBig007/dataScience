@@ -1,8 +1,7 @@
 import pandas as pd
 import matplotlib.pyplot as plt
-import seaborn as sns
-from sklearn.preprocessing import StandardScaler
-from sklearn.cluster import KMeans
+import numpy as np
+
 
 def load(path: str) -> pd.DataFrame:
     """Load a dataset from a CSV file and print its content."""
@@ -10,7 +9,7 @@ def load(path: str) -> pd.DataFrame:
     try:
         assert isinstance(path, str), "the input must be string"
         data = pd.read_csv(path)
-        print(f"Loading {path}\n")
+        print(f"Loading {path} dataset\n")
         return data
 
     except AssertionError as msg:
@@ -20,31 +19,21 @@ def load(path: str) -> pd.DataFrame:
     return None
 
 
-def kmean_clustering(data: pd.DataFrame):
-    """ Perform K-means clustering on the dataset and print the results. """
+def chart_nb_customers(data: pd.DataFrame):
+    """ Create a chart from the data """
+    plt.style.use('ggplot')
     try:
         assert isinstance(data, pd.DataFrame), "arg must be a dataframe"
-        print("Performing K-means clustering...\n")
-
-        scaler = StandardScaler()
-        data_scaled = scaler.fit_transform(data)
-        data_scaled = pd.DataFrame(data_scaled, columns=data.columns)
-
-        wcss = []
-        for i in range (1,11):
-            kmeans = KMeans(n_clusters=i,init='k-means++', n_init=10 ,random_state=42)
-            kmeans.fit(data_scaled)
-            wcss.append(kmeans.inertia_)
-        print("K-means clustering completed.\n")
-
-        plt.figure(figsize=(10, 6))
-        plt.plot(range(1, 11), wcss, marker = '+')
-        plt.title('The Elbow Method')
-        plt.xlabel('Number of Clusters')
+        plt.figure()
+        plt.plot(data['date'], data['num_customers'])
+        x_ticks = ['2022-10-01', '2022-11-01', '2022-12-01', '2023-01-01', '2023-02-01']
+        x_ticks_labels = ['Oct', 'Nov', 'Dec', 'Jan', 'Feb']
+        plt.xticks(ticks=x_ticks, labels=x_ticks_labels)
+        plt.ylabel('Number of customers')
+        plt.margins(x=0, y=0.05)
         plt.tick_params(length=0)
-        plt.savefig('elbow_chart.png')
-        plt.show()
-        print("Elbow plot generated.\n")
+        plt.savefig('nb_customers_chart.png')
+        print('Fist plot created !\n')
 
     except AssertionError as msg:
         print(f"AssertionError: {msg}")
@@ -52,93 +41,47 @@ def kmean_clustering(data: pd.DataFrame):
         print(f"Error: {error}")
 
 
-def groups_graph(data: pd.DataFrame):
-    """ Generate a graph of the groups in the dataset. """
+def chart_total_sales(data: pd.DataFrame):
+    """ Create a chart from the data """
+    plt.style.use('ggplot')
     try:
         assert isinstance(data, pd.DataFrame), "arg must be a dataframe"
+        data['month'] = data['month'].astype(str)
+        plt.figure()
+        plt.bar(data['month'], data['num_sales'])
+        x_ticks = ['10', '11', '12', '1', '2']
+        x_ticks_labels = ['Oct', 'Nov', 'Dec', 'Jan', 'Feb']
+        plt.xticks(ticks=x_ticks, labels=x_ticks_labels)
+        plt.ylabel('total sales in million of ₳')
+        plt.xlabel('month')
+        plt.tick_params(length=0)
+        plt.savefig('total_sales_chart.png')
+        print('Second plot created !\n')
 
-        scaler = StandardScaler()
-        data_scaled = scaler.fit_transform(data)
-        data_scaled = pd.DataFrame(data_scaled, columns=data.columns)
+    except AssertionError as msg:
+        print(f"AssertionError: {msg}")
+    except Exception as error:
+        print(f"Error: {error}")
 
-        kmeans = KMeans(n_clusters=4, init='k-means++', n_init=10, random_state=42)
-        data['cluster'] = kmeans.fit_predict(data_scaled)
-        print("K-means clustering completed.\n")
-        print(data.head())
-        print()
 
-        data_segm_kmean = data_scaled.copy()
-        data_segm_kmean['Segment_K_means'] = kmeans.labels_
-
-        data_segm_analysis = data_segm_kmean.groupby(['Segment_K_means']).mean()
-
-        print("data_segm_analysis\n", data_segm_analysis)
-        print()
-
-        print("Mean:\n", data.mean())
-        print()
-
-        data_segm_kmean['Labels'] = data_segm_kmean['Segment_K_means'].map({
-            0: 'Loyal customers Gold',
-            1: 'Inactive',
-            2: 'New customers',
-            3: 'Loyal customers Platinum'
-        })
-
-        print(data_segm_kmean.head())
-        print()
-
-        data_segm_kmean['Customer_Type'] = data_segm_kmean['Labels'].map({
-            'New customers': 'New customers',
-            'Inactive': 'Inactive',
-            'Loyal customers Platinum': 'Loyal customers',
-            'Loyal customers Gold': 'Loyal customers'
-        })
-
-        customer_counts = data_segm_kmean['Customer_Type'].value_counts()
-        customer_counts = customer_counts.sort_index()
-        color_mapping = { 'Inactive': '#b6c5d8', 'Loyal customers': '#73c0a6', 'New customers': '#f5dcb7' }
-        colors = [color_mapping[customer] for customer in customer_counts.index]
-
-        plt.rcParams['axes.spines.right'] = False
-        plt.rcParams['axes.spines.top'] = False
-        plt.figure(figsize=(10, 8))
-        plt.barh(customer_counts.index, customer_counts.values, color=colors)
-        for index, value in enumerate(customer_counts.values):
-            plt.text(value, index, str(value))
-        plt.tick_params(left=False, bottom=False)
-        plt.savefig('chart_bar.png')
-        plt.show()
-        print("chart_bar generated.\n")
-
-        df_grouped = data.groupby('cluster').median(numeric_only=True).reset_index()
-        df_grouped['Customer'] = df_grouped['cluster'].replace({
-            0: 'Loyal customers',
-            1: 'Inactive',
-            2: 'New customers',
-            3: 'Loyal customers'
-        })
-        df_grouped = df_grouped.groupby('Customer').median(numeric_only=True).reset_index()
-        print(df_grouped)
-
-        plt.figure(figsize=(10, 8))
-        sns.scatterplot(x='recency', y='frequency',
-                        data=df_grouped,
-                        hue='cluster',
-                        size='total_spent',
-                        sizes=(200, 400),
-                        palette=colors,
-                        legend=False)
-        for line in range(0,df_grouped.shape[0]):
-            plt.text(
-                df_grouped["recency"][line] + 0.1,
-                df_grouped["frequency"][line],
-                f"{round(df_grouped['total_spent'][line], 2):.2f} ₳",
-                ha='left')
-        plt.xlabel('Median Recency')
-        plt.ylabel('Median Frequency')
-        plt.show()
-        plt.savefig('chart_median.png')
+def chart_average_spend(data: pd.DataFrame):
+    """ Create a chart from the data """
+    plt.style.use('ggplot')
+    try:
+        assert isinstance(data, pd.DataFrame), "arg must be a dataframe"
+        plt.figure()
+        plt.plot(data['date'], data['tot_sales'])
+        x_ticks = ['2022-10-01', '2022-11-01', '2022-12-01', '2023-01-01', '2023-02-01']
+        x_ticks_labels = ['Oct', 'Nov', 'Dec', 'Jan', 'Feb']
+        plt.xticks(ticks=x_ticks, labels=x_ticks_labels)
+        y_ticks = np.arange(0, data['tot_sales'].max() + 1, 5)
+        plt.yticks(y_ticks)
+        plt.ylabel('average spend/customers in ₳')
+        plt.tick_params(length=0)
+        plt.margins(x=0)
+        plt.fill_between(data['date'], 0, data['tot_sales'])
+        plt.savefig('average_spend_chart.png')
+        print('Third plot created !\n')
 
     except AssertionError as msg:
         print(f"AssertionError: {msg}")
@@ -147,9 +90,15 @@ def groups_graph(data: pd.DataFrame):
 
 
 if __name__ == '__main__':
-    data = load("raw_data.csv")
-    if data is not None:
-        kmean_clustering(data)
-        groups_graph(data)
+    data = load("out_nb_customers.csv")
+    chart_nb_customers(data)
+    
+    sales = load("out_sales_by_month.csv")
+    chart_total_sales(sales)
+    
+    av_spend = load('out_average_spend.csv')
+    chart_average_spend(av_spend)
 
-# docker cp postgres:app/elbow_chart.png ex05 && docker cp postgres:app/chart_median.png ex05 && docker cp postgres:app/chart_bar.png ex05
+# docker cp postgres:app/nb_customers_chart.png .
+# && docker cp postgres:app/total_sales_chart.png .
+# && docker cp postgres:app/average_spend_chart.png .

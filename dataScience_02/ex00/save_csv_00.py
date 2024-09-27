@@ -79,7 +79,7 @@ def export_to_csv():
         with psycopg2.connect(**config) as conn:
             with conn.cursor() as cur:
                 cur.execute("SELECT * FROM sum_event_type ;")
-                with open('out.csv', 'w') as f:
+                with open('pie_out.csv', 'w') as f:
                     cur.copy_expert('COPY sum_event_type TO STDOUT WITH CSV HEADER', f)
         print("Data exported successfully to out.csv.\n")
     except (psycopg2.DatabaseError, Exception) as error:

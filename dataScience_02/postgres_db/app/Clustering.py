@@ -64,7 +64,7 @@ def groups_graph(data: pd.DataFrame):
 
         kmeans = KMeans(n_clusters=4, init='k-means++', n_init=10, random_state=42)
         data['cluster'] = kmeans.fit_predict(data_scaled)
-        print("K-means clustering completed.\n")
+        print("K-means clustering completed.")
         print(data.head())
         print()
 
@@ -72,11 +72,7 @@ def groups_graph(data: pd.DataFrame):
         data_segm_kmean['Segment_K_means'] = kmeans.labels_
 
         data_segm_analysis = data_segm_kmean.groupby(['Segment_K_means']).mean()
-
         print("data_segm_analysis\n", data_segm_analysis)
-        print()
-
-        print("Mean:\n", data.mean())
         print()
 
         data_segm_kmean['Labels'] = data_segm_kmean['Segment_K_means'].map({
@@ -120,7 +116,6 @@ def groups_graph(data: pd.DataFrame):
             3: 'Loyal customers'
         })
         df_grouped = df_grouped.groupby('Customer').median(numeric_only=True).reset_index()
-        print(df_grouped)
 
         plt.figure(figsize=(10, 8))
         sns.scatterplot(x='recency', y='frequency',
@@ -140,6 +135,7 @@ def groups_graph(data: pd.DataFrame):
         plt.ylabel('Median Frequency')
         plt.show()
         plt.savefig('chart_median.png')
+        print("chart_median generated.\n")
 
     except AssertionError as msg:
         print(f"AssertionError: {msg}")

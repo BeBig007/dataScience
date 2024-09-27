@@ -22,27 +22,52 @@ def connect(config):
         with psycopg2.connect(**config) as conn:
             print('Connected to the PostgreSQL server.\n')
             return conn
-
     except (psycopg2.DatabaseError, Exception) as error:
         print(error)
 
 
-def export_to_csv():
+def export_to_csv_box_plot():
     """ Export the sum_event_type table to a CSV file """
     command = """
     COPY (
-        SELECT *
+        SELECT price
         FROM customers
+        WHERE event_type='purchase'
+        ORDER BY price
     ) TO STDOUT WITH CSV HEADER;
     """
     try:
         config = load_config()
         with psycopg2.connect(**config) as conn:
             with conn.cursor() as cur:
-                with open('out.csv', 'w') as f:
+                with open('out_price.csv', 'w') as f:
                     cur.copy_expert(command, f)
-        print("Data exported successfully to out.csv.\n")
+        print("Data exported successfully to out_price.csv.\n")
+    except (psycopg2.DatabaseError, Exception) as error:
+        print(f"Error: {error}")
 
+
+def export_to_csv_average_price():
+    """ Export the sum_event_type table to a CSV file """
+    command = """
+    COPY (
+        SELECT
+            user_id,
+            AVG(price) AS average_price
+        FROM customers
+        WHERE 
+            event_type='purchase'
+        GROUP BY user_id
+        HAVING AVG(price) BETWEEN 27 AND 42
+    ) TO STDOUT WITH CSV HEADER;
+    """
+    try:
+        config = load_config()
+        with psycopg2.connect(**config) as conn:
+            with conn.cursor() as cur:
+                with open('out_average_price.csv', 'w') as f:
+                    cur.copy_expert(command, f)
+        print("Data exported successfully to out_average_price.csv.\n")
     except (psycopg2.DatabaseError, Exception) as error:
         print(f"Error: {error}")
 
@@ -50,4 +75,6 @@ def export_to_csv():
 if __name__ == '__main__':
     config = load_config()
     connect(config)
-    export_to_csv()
+    export_to_csv_box_plot()
+    export_to_csv_average_price()
+

@@ -102,6 +102,6 @@ if __name__ == '__main__':
     av_spend = load('out_average_spend.csv')
     chart_average_spend(av_spend)
 
-# psql -U bebigel -d piscineds -h localhost
-
-# docker cp postgres:nb_customers_chart.png dataScience_02/ex01 && docker cp postgres:total_sales_chart.png dataScience_02/ex01 && docker cp postgres:average_spend_chart.png dataScience_02/ex01
+# docker cp postgres:app/nb_customers_chart.png .
+# && docker cp postgres:app/total_sales_chart.png .
+# && docker cp postgres:app/average_spend_chart.png .
