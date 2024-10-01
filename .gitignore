@@ -23,4 +23,6 @@ subject/item/*.csv
 dataScience_03/data/*.csv
 dataScience_03/ex05/*.csv
 
+dataScience_04/data/*.csv
+
 subject.zip
