@@ -1,5 +1,5 @@
 from sklearn.preprocessing import StandardScaler
-from sklearn.neighbors import KNeighborsClassifier
+from sklearn.neighbors import KNeighborsClassifier 
 from sklearn.model_selection import train_test_split
 from sklearn.metrics import classification_report, accuracy_score, precision_score, f1_score
 import matplotlib.pyplot as plt
@@ -47,44 +47,7 @@ def main():
 
         X_train, X_valid, Y_train, Y_valid = train_test_split(X, Y, train_size=0.8, random_state=42)
 
-        print(f"{c_shape}---------------KNN---------------------{c_reset}")
-        k_values = [i for i in range (1,31)]
-        accuracies = []
-        for k in k_values:
-            knn = KNeighborsClassifier(n_neighbors=k)
-            knn.fit(X_train, Y_train)
-            Y_pred = knn.predict(X_valid)
-            accuracy = accuracy_score(Y_valid, Y_pred)
-            accuracies.append(np.mean(accuracy))
-            precision = precision_score(Y_valid, Y_pred, average='macro')
-            f1 = f1_score(Y_valid, Y_pred, average='macro')
-            print(f"k = {k:2}, accuracy = {accuracy:.2f}, precision = {precision:.2f}, f1 = {f1:.2f}")
 
-        plt.figure()
-        sns.lineplot(x = k_values, y = accuracies)
-        plt.xlabel("k values")
-        plt.ylabel("accuracy")
-        plt.show()
-
-        print(f"{c_shape}---------------Training KNN------------{c_reset}")
-        best_index = np.argmax(accuracies)
-        best_k = k_values[best_index]
-        print(f"{c_red}Best k value: {best_k}\n{c_reset}")
-
-        model = KNeighborsClassifier(n_neighbors=best_k)
-        model.fit(X_train, Y_train)
-
-        print(f"{c_shape}---------------Prediction--------------{c_reset}")
-        Y_pred = model.predict(X_valid)
-        print(f"{c_red}Report on validation data\n{c_reset}")
-        print(classification_report(Y_valid, Y_pred))
-
-        print(f"{c_shape}---------------Test data---------------{c_reset}")
-        df_std = pd.DataFrame(scaler.fit_transform(test_data), columns=test_data.columns)
-        Y_test = model.predict(df_std)
-        with open('KNN.txt', 'w') as f:
-            for line in Y_test:
-                f.write(f"{line}\n")
 
     except AssertionError as msg:
         print(f"Assertion Error: {msg}")
